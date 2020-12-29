@@ -9,6 +9,7 @@ import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreLabel: SKLabelNode!
+    var ballCount = 0
 
     var score = 0 {
         didSet {
@@ -76,14 +77,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
                     box.physicsBody = SKPhysicsBody(rectangleOf: box.size)
                     box.physicsBody?.isDynamic = false
+                    box.name = "box"
 
                     addChild(box)
                 } else {
-                    let ball = SKSpriteNode(imageNamed: "ballRed")
+                    ballCount += 1
+                    if ballCount > 5 {
+                        return
+                    }
+                    let balls = ["ballRed", "ballBlue", "ballCyan", "ballGreen", "ballGrey", "ballPurple", "ballYellow"]
+                    let ball = SKSpriteNode(imageNamed: balls.randomElement()!)
                     ball.physicsBody = SKPhysicsBody(circleOfRadius: ball.size.width / 2.0)
                     ball.physicsBody?.restitution = 0.4
                     ball.physicsBody!.contactTestBitMask = ball.physicsBody!.collisionBitMask
                     ball.position = location
+                    ball.position.y = 680
                     ball.name = "ball"
                     addChild(ball)
                 }
@@ -129,16 +137,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func collisionBetween(ball: SKNode, object: SKNode) {
         if object.name == "good" {
-            destroy(ball: ball)
+            destroyBall(ball: ball)
             score += 1
+            ballCount -= 1
         } else if object.name == "bad" {
-            destroy(ball: ball)
+            destroyBall(ball: ball)
             score -= 1
+        }
+        else if object.name == "box" {
+            destroyBox(object: object)
         }
     }
 
-    func destroy(ball: SKNode) {
+    func destroyBall(ball: SKNode) {
+        if let fireParticles = SKEmitterNode(fileNamed: "FireParticles") {
+              fireParticles.position = ball.position
+              addChild(fireParticles)
+          }
         ball.removeFromParent()
+    }
+    
+    func destroyBox(object: SKNode) {
+        object.removeFromParent()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
