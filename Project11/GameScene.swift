@@ -9,6 +9,7 @@ import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreLabel: SKLabelNode!
+    
     var ballCount = 0
 
     var score = 0 {
@@ -28,6 +29,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    
     override func didMove(to view: SKView) {
         let background = SKSpriteNode(imageNamed: "background.jpg")
         background.position = CGPoint(x: 512, y: 384)
@@ -158,6 +160,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func destroyBox(object: SKNode) {
+        if let magicParticles = SKEmitterNode(fileNamed: "MagicParticles") {
+              magicParticles.position = object.position
+              addChild(magicParticles)
+        }
         object.removeFromParent()
     }
     
